@@ -1,0 +1,36 @@
+version: '3.8'
+
+services:
+  api:
+    build:
+      context: ../  # Root project directory
+      dockerfile: docker/api/Dockerfile
+    volumes:
+      - ../api:/var/www/html  # Bind mount the root project directory
+    environment:
+      DATABASE_URL: mysql://db:db@db:3306/db
+    depends_on:
+      - db
+
+  nginx:
+    image: nginx:latest
+    ports:
+      - "8080:80"
+    volumes:
+      - ./nginx/conf.d/api.conf:/etc/nginx/conf.d/default.conf  # Nginx configuration
+      - ../api:/var/www/html  # Bind mount the root project directory
+    depends_on:
+      - api
+
+  db:
+    image: mysql:5.7
+    environment:
+      MYSQL_ROOT_PASSWORD: db
+      MYSQL_DATABASE: db
+      MYSQL_USER: db
+      MYSQL_PASSWORD: db
+    volumes:
+      - db_data:/var/lib/mysql
+
+volumes:
+  db_data:

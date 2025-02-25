@@ -15,7 +15,7 @@ class UserRegistrationController extends AbstractController
     {
     }
 
-    #[Route('/register', 'user_registration', methods: ['POST'])]
+    #[Route('/api/register', 'user_registration', methods: ['POST'])]
     public function register(
         Request $request,
 

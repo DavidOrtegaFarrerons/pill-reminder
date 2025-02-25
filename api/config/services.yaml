@@ -26,3 +26,9 @@ services:
     App\Controller\:
         resource: '../src/Controller'
         tags: [ 'controller.service_arguments' ]
+
+    App\Security\Http\CookieTokenExtractor:
+        arguments:
+            $cookieName: 'jwt'
+        tags:
+            - { name: lexik_jwt_authentication.token_extractor, alias: 'cookie' }

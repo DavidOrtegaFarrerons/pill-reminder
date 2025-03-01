@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use App\Repository\UserRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\Types\UuidType;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
@@ -36,6 +38,17 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      */
     #[ORM\Column]
     private ?string $password = null;
+
+    /**
+     * @var Collection<int, Pill>
+     */
+    #[ORM\OneToMany(targetEntity: Pill::class, mappedBy: 'user', orphanRemoval: true)]
+    private Collection $pills;
+
+    public function __construct()
+    {
+        $this->pills = new ArrayCollection();
+    }
 
     public function getId(): ?Uuid
     {
@@ -128,5 +141,35 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     {
         // If you store any temporary, sensitive data on the user, clear it here
         // $this->plainPassword = null;
+    }
+
+    /**
+     * @return Collection<int, Pill>
+     */
+    public function getPills(): Collection
+    {
+        return $this->pills;
+    }
+
+    public function addPill(Pill $pill): static
+    {
+        if (!$this->pills->contains($pill)) {
+            $this->pills->add($pill);
+            $pill->setUser($this);
+        }
+
+        return $this;
+    }
+
+    public function removePill(Pill $pill): static
+    {
+        if ($this->pills->removeElement($pill)) {
+            // set the owning side to null (unless already changed)
+            if ($pill->getUser() === $this) {
+                $pill->setUser(null);
+            }
+        }
+
+        return $this;
     }
 }

@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Service;
+namespace App\Service\PillIntake;
 
 use App\Entity\PillIntake;
 use App\Entity\User;
@@ -11,7 +11,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 
-class PillIntakeTakenService
+class TakePillIntakeService
 {
 
     public function __construct(
@@ -33,6 +33,17 @@ class PillIntakeTakenService
 
         $status = PillIntakeStatus::tryFrom($formData['status']);
 
+        if ($status === PillIntakeStatus::TAKEN) {
+            if (
+                DateTime::createFromInterface($pillIntakeLog->getScheduledTime())->modify($pillIntakeLog->getPill()->getFrequency()) >= $pillIntakeLog->getPill()->getEndDate()
+            ) {
+                $pillIntakeLog->setStatus(PillIntakeStatus::FINISHED);
+                $this->entityManager->persist($pillIntakeLog);
+                $this->entityManager->flush();
+                return new JsonResponse(['success' => true], 201);
+            }
+        }
+
         $pillIntakeLog->setStatus($status);
 
         $this->entityManager->persist($pillIntakeLog);
@@ -49,6 +60,7 @@ class PillIntakeTakenService
 
     private function generateNewPillIntakeLog(?PillIntake $pillIntakeLog) : void
     {
+        //I should modify the end date of the Pill itself in case we need to adjust the intakes
         $newPillIntakeLog = (new PillIntake())
             ->setPill($pillIntakeLog->getPill())
             ->setStatus(PillIntakeStatus::PENDING)

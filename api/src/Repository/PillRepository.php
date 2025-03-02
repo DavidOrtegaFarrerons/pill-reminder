@@ -36,4 +36,14 @@ class PillRepository extends ServiceEntityRepository
             ->getResult()
         ;
     }
+
+    public function getById(int $id) : ?Pill
+    {
+        return $this->createQueryBuilder('p')
+            ->andWhere('p.id = :id')
+            ->setParameter('id', $id)
+            ->getQuery()
+            ->getSingleResult()
+        ;
+    }
 }

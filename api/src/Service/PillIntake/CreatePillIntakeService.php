@@ -1,13 +1,13 @@
 <?php
 
-namespace App\Service;
+namespace App\Service\PillIntake;
 
 use App\Entity\Pill;
 use App\Entity\PillIntake;
 use App\Enum\PillIntakeStatus;
 use Doctrine\ORM\EntityManagerInterface;
 
-class PillIntakeCreationService
+class CreatePillIntakeService
 {
 
     public function __construct(private readonly EntityManagerInterface $entityManager)

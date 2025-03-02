@@ -8,4 +8,5 @@ enum PillIntakeStatus: string
     case ADJUSTED = 'adjusted';
     case SKIPPED = 'skipped';
     case PENDING = 'pending';
+    case FINISHED = 'finished';
 }

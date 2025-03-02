@@ -2,7 +2,7 @@
 
 namespace App\Controller;
 
-use App\Service\PillIntakeTakenService;
+use App\Service\PillIntake\TakePillIntakeService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -13,7 +13,7 @@ class PilIntakeLogController extends AbstractController
 {
 
     public function __construct(
-        private readonly PillIntakeTakenService $pillIntakeLogTakenService
+        private readonly TakePillIntakeService $pillIntakeLogTakenService
     )
     {
     }

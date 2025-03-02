@@ -2,25 +2,24 @@
 
 namespace App\Controller;
 
-use App\Entity\Pill;
 use App\Entity\User;
 use App\Repository\PillRepository;
-use App\Service\PillCreationService;
-use App\Service\PillIntakeCreationService;
+use App\Service\Pill\CreatePillService;
+use App\Service\Pill\UpdatePillService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\CurrentUser;
-use Symfony\Component\Serializer\SerializerInterface;
 
 class PillController extends AbstractController
 {
 
     public function __construct(
-        private readonly PillCreationService $pillCreationService,
-        private readonly PillRepository $pillRepository,
+        private readonly CreatePillService $pillCreationService,
+        private readonly UpdatePillService $pillUpdateService,
+        private readonly PillRepository    $pillRepository,
     )
     {
     }
@@ -28,7 +27,21 @@ class PillController extends AbstractController
     #[Route('/api/pills', 'create_pill', methods: ['POST'])]
     public function createAction(#[CurrentUser] User $user, Request $request) : JsonResponse
     {
-        $pill = $this->pillCreationService->create($user, $request);
+        $formData = json_decode($request->getContent(), true);
+        $this->pillCreationService->create($user, $formData);
+
+        return $this->json(
+            [
+                'pill' => true
+            ]
+        );
+    }
+
+    #[Route('/api/pills/{id}', 'update_pill', methods: ['PUT'])]
+    public function updateAction(#[CurrentUser] $user, Request $request, $id) : JsonResponse
+    {
+        $formData = json_decode($request->getContent(), true);
+        $this->pillUpdateService->update($user, $formData, $id);
 
         return $this->json(
             [

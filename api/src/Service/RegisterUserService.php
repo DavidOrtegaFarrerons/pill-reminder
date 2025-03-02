@@ -2,16 +2,15 @@
 
 namespace App\Service;
 
-use App\Dto\UserRegistrationDto;
+use App\Dto\User\RegisterUserDto;
 use App\Entity\User;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
-use Symfony\Component\PasswordHasher\PasswordHasherInterface;
 use Symfony\Component\Serializer\SerializerInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
-class UserRegistrationService
+class RegisterUserService
 {
 
     public function __construct(
@@ -25,7 +24,7 @@ class UserRegistrationService
 
     public function registerUser(array $data) : JsonResponse
     {
-        $dto = $this->serializer->denormalize($data, UserRegistrationDto::class);
+        $dto = $this->serializer->denormalize($data, RegisterUserDto::class);
 
         if (!$this->isValid($dto)) {
             return new JsonResponse(['message' => 'error when validating user', 'success' => false], 400);
@@ -41,12 +40,12 @@ class UserRegistrationService
         return new JsonResponse(['message' => 'Registration successful', 'success' => true], 201);
     }
 
-    private function isValid(UserRegistrationDto $dto) : bool
+    private function isValid(RegisterUserDto $dto) : bool
     {
         return $this->validator->validate($dto)->count() === 0;
     }
 
-    private function register(UserRegistrationDto $dto) : void
+    private function register(RegisterUserDto $dto) : void
     {
         $user = (new User())
             ->setEmail($dto->getEmail())

@@ -1,9 +1,9 @@
 <?php
 
-namespace App\Dto;
+namespace App\Dto\User;
 use Symfony\Component\Validator\Constraints as Assert;
 
-class UserRegistrationDto
+class RegisterUserDto
 {
     #[Assert\NotBlank]
     #[Assert\Email]

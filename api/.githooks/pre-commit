@@ -1,0 +1,1 @@
+cd ../../docker && docker-compose exec api sh -c "vendor/bin/phpstan analyse -l 6 src && vendor/bin/php-cs-fixer fix src"

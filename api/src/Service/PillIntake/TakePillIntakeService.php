@@ -34,19 +34,17 @@ class TakePillIntakeService
         $status = PillIntakeStatus::tryFrom($formData['status']);
 
         if ($status === PillIntakeStatus::TAKEN) {
+            $nextPillIntakeTime = DateTime::createFromInterface($pillIntakeLog->getScheduledTime())->modify($pillIntakeLog->getPill()->getFrequency());
             if (
-                DateTime::createFromInterface($pillIntakeLog->getScheduledTime())->modify($pillIntakeLog->getPill()->getFrequency()) >= $pillIntakeLog->getPill()->getEndDate()
+                $nextPillIntakeTime >= $pillIntakeLog->getPill()->getEndDate()
             ) {
                 $pillIntakeLog->setStatus(PillIntakeStatus::FINISHED);
-                $this->entityManager->persist($pillIntakeLog);
                 $this->entityManager->flush();
                 return new JsonResponse(['success' => true], 201);
             }
         }
 
         $pillIntakeLog->setStatus($status);
-
-        $this->entityManager->persist($pillIntakeLog);
         $this->entityManager->flush();
 
         match (true) {
@@ -72,7 +70,7 @@ class TakePillIntakeService
         ;
 
 
-        $this->entityManager->persist($newPillIntakeLog);
+        $this->repository->save($newPillIntakeLog);
         $this->entityManager->flush();
     }
 
@@ -89,7 +87,7 @@ class TakePillIntakeService
         ;
 
 
-        $this->entityManager->persist($newPillIntakeLog);
+        $this->repository->save($newPillIntakeLog);
         $this->entityManager->flush();
     }
 }

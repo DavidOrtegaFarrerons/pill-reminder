@@ -4,6 +4,7 @@ namespace App\Service;
 
 use App\Dto\User\RegisterUserDto;
 use App\Entity\User;
+use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
@@ -17,7 +18,7 @@ class RegisterUserService
         private readonly SerializerInterface $serializer,
         private readonly ValidatorInterface $validator,
         private readonly UserPasswordHasherInterface $passwordHasher,
-        private readonly EntityManagerInterface $entityManager
+        private readonly UserRepository $repository
     )
     {
     }
@@ -54,7 +55,6 @@ class RegisterUserService
 
         $user->setPassword($this->passwordHasher->hashPassword($user, $dto->getPassword()));
 
-        $this->entityManager->persist($user);
-        $this->entityManager->flush();
+        $this->repository->save($user);
     }
 }

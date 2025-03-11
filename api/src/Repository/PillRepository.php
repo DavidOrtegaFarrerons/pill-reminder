@@ -6,12 +6,14 @@ use App\Entity\Pill;
 use App\Entity\User;
 use App\Enum\PillIntakeStatus;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\Mapping\Entity;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
  * @extends ServiceEntityRepository<Pill>
  */
-class PillRepository extends ServiceEntityRepository
+class PillRepository extends BaseRepository implements RepositoryInterface
 {
     public function __construct(ManagerRegistry $registry)
     {

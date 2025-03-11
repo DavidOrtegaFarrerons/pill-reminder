@@ -12,6 +12,8 @@ use Symfony\Component\Security\Http\Attribute\CurrentUser;
 class UserLoginController extends AbstractController
 {
 
+    const ONE_HOUR = 3600;
+
     public function __construct(
         private readonly JWTTokenManagerInterface $jwtManager
     )
@@ -35,7 +37,7 @@ class UserLoginController extends AbstractController
             new Cookie(
                 'jwt',
                 $token,
-                time() + 3600, //1 hour
+                time() + self::ONE_HOUR,
                 '/',
                 '',
                 false,

@@ -7,6 +7,7 @@ use App\Entity\User;
 use App\Event\PillCreatedEvent;
 use App\Factory\Pill\PillDtoFactory;
 use App\Mapper\Pill\PillMapper;
+use App\Repository\PillRepository;
 use App\Service\PillIntake\CreatePillIntakeService;
 use Doctrine\ORM\EntityManagerInterface;
 use Psr\EventDispatcher\EventDispatcherInterface;
@@ -19,8 +20,7 @@ class CreatePillService
         private readonly PillDtoFactory $factory,
         private readonly ValidatorInterface $validator,
         private readonly PillMapper $mapper,
-        private readonly CreatePillIntakeService $intakeLogCreationService,
-        private readonly EntityManagerInterface  $entityManager,
+        private readonly PillRepository $repository,
         private readonly EventDispatcherInterface $eventDispatcher
     )
     {
@@ -38,8 +38,7 @@ class CreatePillService
         $pill = $this->mapper->mapDtoToEntity($pillDto, new Pill());
 
         $pill->setUser($user);
-        $this->entityManager->persist($pill);
-        $this->entityManager->flush();
+        $this->repository->save($pill);
 
         $this->eventDispatcher->dispatch(new PillCreatedEvent($pill));
 

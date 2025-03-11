@@ -24,7 +24,6 @@ class UpdatePillService
         private readonly PillDtoFactory         $factory,
         private readonly ValidatorInterface     $validator,
         private readonly PillMapper             $mapper,
-        private readonly EntityManagerInterface $entityManager
     )
     {
     }

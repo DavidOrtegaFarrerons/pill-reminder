@@ -48,43 +48,44 @@ class TakePillIntakeService
         $this->entityManager->flush();
 
         match (true) {
-            $status === PillIntakeStatus::TAKEN || $status === PillIntakeStatus::SKIPPED => $this->generateNewPillIntakeLog($pillIntakeLog),
-            $status === PillIntakeStatus::ADJUSTED => $this->generateAdjustedPillIntakeLog($pillIntakeLog),
+            $status === PillIntakeStatus::TAKEN || $status === PillIntakeStatus::SKIPPED => $this->generateNewPillIntake($pillIntakeLog),
+            $status === PillIntakeStatus::ADJUSTED => $this->generateAdjustedPillIntake($pillIntakeLog),
             default => throw new \Exception('Unexpected match value')
         };
 
         return new JsonResponse(['success' => true], 201);
     }
 
-    private function generateNewPillIntakeLog(?PillIntake $pillIntakeLog) : void
+    private function generateNewPillIntake(?PillIntake $pillIntake) : void
     {
-        //I should modify the end date of the Pill itself in case we need to adjust the intakes
         $newPillIntakeLog = (new PillIntake())
-            ->setPill($pillIntakeLog->getPill())
+            ->setPill($pillIntake->getPill())
             ->setStatus(PillIntakeStatus::PENDING)
             ->setScheduledTime(
-                (DateTime::createFromInterface($pillIntakeLog->getScheduledTime()))->modify(
-                    $pillIntakeLog->getPill()->getFrequency()
+                (DateTime::createFromInterface($pillIntake->getScheduledTime()))->modify(
+                    $pillIntake->getPill()->getFrequency()
                 )
             )
         ;
-
 
         $this->repository->save($newPillIntakeLog);
         $this->entityManager->flush();
     }
 
-    private function generateAdjustedPillIntakeLog(?PillIntake $pillIntakeLog): void
+    private function generateAdjustedPillIntake(?PillIntake $pillIntake): void
     {
         $newPillIntakeLog = (new PillIntake())
-            ->setPill($pillIntakeLog->getPill())
+            ->setPill($pillIntake->getPill())
             ->setStatus(PillIntakeStatus::PENDING)
             ->setScheduledTime(
                 (new \DateTime())->modify(
-                    $pillIntakeLog->getPill()->getFrequency()
+                    $pillIntake->getPill()->getFrequency()
                 )
             )
         ;
+
+        $diffTime = $pillIntake->getScheduledTime()->diff(new DateTime());
+        $pillIntake->getPill()->setEndDate(DateTime::createFromInterface($pillIntake->getPill()->getEndDate())->add($diffTime));
 
 
         $this->repository->save($newPillIntakeLog);

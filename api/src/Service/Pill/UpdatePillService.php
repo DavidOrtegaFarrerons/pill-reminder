@@ -36,7 +36,7 @@ class UpdatePillService
         }
 
         if ($pill->getUser() !== $user) {
-            throw new UnauthorizedHttpException('You do not have access to this pill');
+            throw new UnauthorizedHttpException('Bearer', 'You do not have access to this pill');
         }
 
         $dto = $this->factory->createFromArray($formData);

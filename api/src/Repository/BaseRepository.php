@@ -22,7 +22,7 @@ abstract class BaseRepository extends ServiceEntityRepository
         $this->entityManager->persist($entity);
     }
 
-    public function remove(object $entity): void
+    public function delete(object $entity): void
     {
         $this->entityManager->remove($entity);
     }

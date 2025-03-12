@@ -6,6 +6,9 @@ use App\Dto\Pill\PillDto;
 
 class PillDtoFactory
 {
+    /**
+     * @param array<string, mixed> $data
+     */
     public function createFromArray(array $data): PillDto
     {
         return (new PillDto())

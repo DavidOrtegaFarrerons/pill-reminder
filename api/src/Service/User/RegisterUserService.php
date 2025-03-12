@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Service;
+namespace App\Service\User;
 
 use App\Dto\User\RegisterUserDto;
 use App\Entity\User;
@@ -18,7 +18,8 @@ class RegisterUserService
         private readonly SerializerInterface $serializer,
         private readonly ValidatorInterface $validator,
         private readonly UserPasswordHasherInterface $passwordHasher,
-        private readonly UserRepository $repository
+        private readonly UserRepository $repository,
+        private readonly EntityManagerInterface $entityManager,
     )
     {
     }
@@ -56,5 +57,6 @@ class RegisterUserService
         $user->setPassword($this->passwordHasher->hashPassword($user, $dto->getPassword()));
 
         $this->repository->save($user);
+        $this->entityManager->flush();
     }
 }

@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Entity\User;
 use Lexik\Bundle\JWTAuthenticationBundle\Services\JWTTokenManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Cookie;
@@ -9,7 +10,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\CurrentUser;
 
-class UserLoginController extends AbstractController
+class LoginController extends AbstractController
 {
 
     const ONE_HOUR = 3600;
@@ -21,7 +22,7 @@ class UserLoginController extends AbstractController
     }
 
     #[Route('/api/login', 'user_login', methods: ['POST'])]
-    public function index(#[CurrentUser] $user) : JsonResponse
+    public function index(#[CurrentUser] ?User $user) : JsonResponse
     {
 
         if ($user === null) {

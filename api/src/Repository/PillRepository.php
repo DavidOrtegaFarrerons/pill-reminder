@@ -11,7 +11,7 @@ use Doctrine\ORM\Mapping\Entity;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
- * @extends ServiceEntityRepository<Pill>
+ * @extends BaseRepository<Pill>
  */
 class PillRepository extends BaseRepository implements RepositoryInterface
 {

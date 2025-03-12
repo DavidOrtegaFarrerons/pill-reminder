@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Entity\User;
 use App\Service\PillIntake\TakePillIntakeService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -19,7 +20,7 @@ class PilIntakeLogController extends AbstractController
     }
 
     #[Route('/api/pill-intake/{id}', methods: ['PUT'])]
-    public function takeAction(#[CurrentUser] $user, Request $request, int $id) : JsonResponse
+    public function takeAction(#[CurrentUser] User $user, Request $request, int $id) : JsonResponse
     {
         return $this->pillIntakeLogTakenService->take($user, $request, $id);
     }

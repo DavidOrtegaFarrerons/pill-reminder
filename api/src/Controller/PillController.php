@@ -11,6 +11,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 use Symfony\Component\HttpKernel\Exception\UnauthorizedHttpException;
 use Symfony\Component\Routing\Attribute\Route;
@@ -42,20 +43,16 @@ class PillController extends AbstractController
     }
 
     #[Route('/api/pills/{id}', 'update_pill', methods: ['PUT'])]
-    public function updateAction(#[CurrentUser] $user, Request $request, $id) : JsonResponse
+    public function updateAction(#[CurrentUser] User $user, Request $request, int $id) : JsonResponse
     {
         $formData = json_decode($request->getContent(), true);
         $this->pillUpdateService->update($user, $formData, $id);
 
-        return $this->json(
-            [
-                'pill' => true
-            ]
-        );
+        return $this->json([], Response::HTTP_NO_CONTENT);
     }
 
     #[Route('api/pills/{id}', 'delete_pill', methods: ['DELETE'])]
-    public function deleteAction(#[CurrentUser] $user, Request $request, $id) : JsonResponse
+    public function deleteAction(#[CurrentUser] User $user, Request $request, int $id) : JsonResponse
     {
         try {
             $this->deletePillService->delete($user, $id);
@@ -63,7 +60,7 @@ class PillController extends AbstractController
             return $this->json(
                 [
                     'message' => $exception->getMessage()
-                ]
+                ], Response::HTTP_NOT_ACCEPTABLE
             );
         }
 
@@ -71,7 +68,7 @@ class PillController extends AbstractController
     }
 
     #[Route('/api/pills', 'get_all_pills', methods: ['GET'])]
-    public function getAllAction(#[CurrentUser] User $user, Request $request, EntityManagerInterface $entityManager) : JsonResponse
+    public function getAllAction(#[CurrentUser] User $user) : JsonResponse
     {
         return $this->json(
             [

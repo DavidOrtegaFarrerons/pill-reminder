@@ -7,6 +7,10 @@ use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\Persistence\ManagerRegistry;
 
+/**
+ * @template T of object
+ * @extends ServiceEntityRepository<T>
+ */
 abstract class BaseRepository extends ServiceEntityRepository
 {
     protected EntityManagerInterface $entityManager;

@@ -9,7 +9,7 @@ use Doctrine\ORM\Mapping\Entity;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
- * @extends ServiceEntityRepository<PillIntake>
+ * @extends BaseRepository<PillIntake>
  */
 class PillIntakeRepository extends BaseRepository implements RepositoryInterface
 {

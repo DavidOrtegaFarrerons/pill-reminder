@@ -25,6 +25,6 @@ class PillCreatedSubscriber implements EventSubscriberInterface
     public function onPillCreated(PillCreatedEvent $event)
     {
         $pill = $event->getPill();
-        $this->createPillIntakeService->createFirstPillIntakeLog($pill);
+        $this->createPillIntakeService->createFirstPillIntake($pill);
     }
 }

@@ -35,6 +35,11 @@ class PillIntake
     #[ORM\Column]
     private ?\DateTimeImmutable $updatedAt = null;
 
+    public function isLastPillIntake() : bool {
+        $nextPillIntakeTime = $this->getScheduledTime()->modify($this->getPill()->getFrequency());
+        return $nextPillIntakeTime >= $this->getPill()->getEndDate();
+    }
+
     public function getId(): ?int
     {
         return $this->id;

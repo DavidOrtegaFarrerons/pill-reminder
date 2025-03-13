@@ -5,90 +5,67 @@ namespace App\Service\PillIntake;
 use App\Entity\PillIntake;
 use App\Entity\User;
 use App\Enum\PillIntakeStatus;
+use App\Event\PillIntake\PillIntakeStatusAdjustedEvent;
+use App\Event\PillIntake\PillIntakeStatusSkippedEvent;
+use App\Event\PillIntake\PillIntakeStatusTakenEvent;
 use App\Repository\PillIntakeRepository;
 use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
+use http\Exception\InvalidArgumentException;
+use http\Exception\RuntimeException;
+use http\Exception\UnexpectedValueException;
+use Psr\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpKernel\Exception\UnauthorizedHttpException;
+use Symfony\Component\Validator\Exception\ValidationFailedException;
 
 class TakePillIntakeService
 {
-
     public function __construct(
         private readonly PillIntakeRepository   $repository,
-        private readonly EntityManagerInterface $entityManager
-    )
-    {
-    }
+        private readonly UpdatePillIntakeActualTimeService $updatePillIntakeActualTimeService,
+        private readonly EntityManagerInterface $entityManager,
+        private readonly EventDispatcherInterface $eventDispatcher
+    ) {}
 
-    public function take(User $user, Request $request, int $id) : JsonResponse
+    /**
+     * @throws \Exception
+     */
+    public function take(User $user, array $formData, int $id) : void
     {
-        $pillIntakeLog = $this->repository->getById($id);
+        $pillIntake = $this->repository->getById($id);
 
-        if ($pillIntakeLog->getPill()->getUser() !== $user) {
-            return new JsonResponse([], 403);
+        if ($pillIntake->getPill()->getUser() !== $user) {
+            throw new UnauthorizedHttpException('Bearer', 'The given pill is not from the given user');
         }
 
-        $formData = json_decode($request->getContent(), true);
+        if (!isset($formData['status'])) {
+            throw new UnexpectedValueException("Status must be present in the data");
+        }
 
         $status = PillIntakeStatus::tryFrom($formData['status']);
 
-        if ($status === PillIntakeStatus::TAKEN) {
-            $nextPillIntakeTime = DateTime::createFromInterface($pillIntakeLog->getScheduledTime())->modify($pillIntakeLog->getPill()->getFrequency());
-            if (
-                $nextPillIntakeTime >= $pillIntakeLog->getPill()->getEndDate()
-            ) {
-                $pillIntakeLog->setStatus(PillIntakeStatus::FINISHED);
-                $this->entityManager->flush();
-                return new JsonResponse(['success' => true], 201);
-            }
+        if (!$status) {
+            throw new InvalidArgumentException("Status is invalid");
         }
 
-        $pillIntakeLog->setStatus($status);
+        $this->updatePillIntakeActualTimeService->update($pillIntake, $status);
+
+        if ($pillIntake->isLastPillIntake()) {
+            $pillIntake->setStatus(PillIntakeStatus::FINISHED);
+            $this->entityManager->flush();
+            return;
+        }
+
+        $pillIntake->setStatus($status);
         $this->entityManager->flush();
 
-        match (true) {
-            $status === PillIntakeStatus::TAKEN || $status === PillIntakeStatus::SKIPPED => $this->generateNewPillIntake($pillIntakeLog),
-            $status === PillIntakeStatus::ADJUSTED => $this->generateAdjustedPillIntake($pillIntakeLog),
+        match ($status) {
+            PillIntakeStatus::TAKEN => $this->eventDispatcher->dispatch(new PillIntakeStatusTakenEvent($pillIntake)),
+            PillIntakeStatus::ADJUSTED => $this->eventDispatcher->dispatch(new PillIntakeStatusAdjustedEvent($pillIntake)),
+            PillIntakeStatus::SKIPPED => $this->eventDispatcher->dispatch(new PillIntakeStatusSkippedEvent($pillIntake)),
             default => throw new \Exception('Unexpected match value')
         };
-
-        return new JsonResponse(['success' => true], 201);
-    }
-
-    private function generateNewPillIntake(?PillIntake $pillIntake) : void
-    {
-        $newPillIntakeLog = (new PillIntake())
-            ->setPill($pillIntake->getPill())
-            ->setStatus(PillIntakeStatus::PENDING)
-            ->setScheduledTime(
-                (DateTime::createFromInterface($pillIntake->getScheduledTime()))->modify(
-                    $pillIntake->getPill()->getFrequency()
-                )
-            )
-        ;
-
-        $this->repository->save($newPillIntakeLog);
-        $this->entityManager->flush();
-    }
-
-    private function generateAdjustedPillIntake(?PillIntake $pillIntake): void
-    {
-        $newPillIntakeLog = (new PillIntake())
-            ->setPill($pillIntake->getPill())
-            ->setStatus(PillIntakeStatus::PENDING)
-            ->setScheduledTime(
-                (new \DateTime())->modify(
-                    $pillIntake->getPill()->getFrequency()
-                )
-            )
-        ;
-
-        $diffTime = $pillIntake->getScheduledTime()->diff(new DateTime());
-        $pillIntake->getPill()->setEndDate(DateTime::createFromInterface($pillIntake->getPill()->getEndDate())->add($diffTime));
-
-
-        $this->repository->save($newPillIntakeLog);
-        $this->entityManager->flush();
     }
 }

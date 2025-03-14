@@ -2,8 +2,7 @@
 
 namespace App\Subscriber\Pill;
 
-use App\Entity\Pill;
-use App\Event\PillCreatedEvent;
+use App\Event\Pill\PillCreatedEvent;
 use App\Service\PillIntake\CreatePillIntakeService;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 

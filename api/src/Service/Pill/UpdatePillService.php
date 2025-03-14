@@ -4,10 +4,12 @@ namespace App\Service\Pill;
 
 use App\Entity\Pill;
 use App\Entity\User;
+use App\Event\Pill\PillUpdatedEvent;
 use App\Factory\Pill\PillDtoFactory;
 use App\Mapper\Pill\PillMapper;
 use App\Repository\PillRepository;
 use Doctrine\ORM\EntityManagerInterface;
+use Psr\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
@@ -24,6 +26,7 @@ class UpdatePillService
         private readonly PillDtoFactory         $factory,
         private readonly ValidatorInterface     $validator,
         private readonly PillMapper             $mapper,
+        private readonly EventDispatcherInterface $dispatcher
     )
     {
     }
@@ -48,6 +51,8 @@ class UpdatePillService
 
         $pill = $this->mapper->mapDtoToEntity($dto, $pill);
         $this->repository->update();
+
+        $this->dispatcher->dispatch(new PillUpdatedEvent($pill));
 
         return $pill;
     }

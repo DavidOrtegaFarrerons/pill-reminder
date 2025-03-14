@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Event;
+namespace App\Event\Pill;
 
 use App\Entity\Pill;
 use Symfony\Contracts\EventDispatcher\Event;

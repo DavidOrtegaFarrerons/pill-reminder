@@ -4,12 +4,10 @@ namespace App\Service\Pill;
 
 use App\Entity\Pill;
 use App\Entity\User;
-use App\Event\PillCreatedEvent;
+use App\Event\Pill\PillCreatedEvent;
 use App\Factory\Pill\PillDtoFactory;
 use App\Mapper\Pill\PillMapper;
 use App\Repository\PillRepository;
-use App\Service\PillIntake\CreatePillIntakeService;
-use Doctrine\ORM\EntityManagerInterface;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Validator\Exception\ValidationFailedException;
 use Symfony\Component\Validator\Validator\ValidatorInterface;

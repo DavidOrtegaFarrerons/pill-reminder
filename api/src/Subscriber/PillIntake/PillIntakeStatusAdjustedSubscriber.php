@@ -2,10 +2,7 @@
 
 namespace App\Subscriber\PillIntake;
 
-use App\Entity\Pill;
-use App\Event\PillCreatedEvent;
 use App\Event\PillIntake\PillIntakeStatusAdjustedEvent;
-use App\Event\PillIntake\PillIntakeStatusTakenEvent;
 use App\Service\PillIntake\CreatePillIntakeService;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 

@@ -16,7 +16,7 @@ cd pill-reminder
 ### 2. Prepare the Environment
 Copy the development environment file:
 ```bash
-cp .env.dev .env.dev.local
+cp api/.env.dev api/.env.dev.local
 ```
 
 ### 3. Build and Start the Project
@@ -49,7 +49,7 @@ JWT_PASSPHRASE=your_passphrase
 
 For CORS issues, set the frontend domain, the default for pill-reminder-fe is:
 ```
-CORS_ALLOW_ORIGIN=localhost:5173
+CORS_ALLOW_ORIGIN=http://localhost:5173
 ```
 
 For the DB configure it also in the env, default for the docker is:

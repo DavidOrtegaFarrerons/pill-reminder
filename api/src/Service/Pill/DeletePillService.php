@@ -12,8 +12,7 @@ class DeletePillService
 {
 
     public function __construct(
-        private readonly PillRepository $repository,
-        private readonly EntityManagerInterface $entityManager
+        private readonly PillRepository $repository
     )
     {
     }
@@ -31,6 +30,5 @@ class DeletePillService
         }
 
         $this->repository->delete($pill);
-        $this->entityManager->flush();
     }
 }

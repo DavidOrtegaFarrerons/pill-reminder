@@ -20,7 +20,6 @@ class UpdateUserService
         private readonly UserMapper $userMapper,
         private readonly UserPasswordHasherInterface $passwordHasher,
         private readonly UserRepository $userRepository,
-        private readonly EntityManagerInterface $entityManager
     )
     {
     }
@@ -40,7 +39,6 @@ class UpdateUserService
             $user->setPassword($this->passwordHasher->hashPassword($user, $dto->getPassword()));
         }
 
-        $this->userRepository->save($user);
-        $this->entityManager->flush();
+        $this->userRepository->update();
     }
 }

@@ -6,6 +6,7 @@ use App\Enum\PillIntakeStatus;
 use App\Repository\PillIntakeRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: PillIntakeRepository::class)]
 #[ORM\HasLifecycleCallbacks]
@@ -14,10 +15,12 @@ class PillIntake
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[Groups(["pill_intake:list"])]
     private ?int $id = null;
 
     #[ORM\ManyToOne(inversedBy: 'pillIntakeLogs')]
     #[ORM\JoinColumn(nullable: false)]
+    #[Groups(["pill_intake:list"])]
     private ?Pill $pill = null;
 
     #[ORM\Column(enumType: PillIntakeStatus::class)]
@@ -27,6 +30,7 @@ class PillIntake
     private ?\DateTimeInterface $scheduledTime = null;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)]
+    #[Groups(["pill_intake:list"])]
     private ?\DateTimeInterface $actualTime = null;
 
     #[ORM\Column]

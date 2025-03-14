@@ -7,6 +7,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: PillRepository::class)]
 class Pill
@@ -14,9 +15,11 @@ class Pill
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[Groups(["pill_intake:list"])]
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
+    #[Groups(["pill_intake:list"])]
     private ?string $name = null;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
@@ -36,11 +39,12 @@ class Pill
      * @var Collection<int, PillIntake>
      */
     #[ORM\OneToMany(targetEntity: PillIntake::class, mappedBy: 'pill', orphanRemoval: true)]
-    private Collection $pillIntakeLogs;
+    #[Groups(["pill_intake:list"])]
+    private Collection $pillIntakes;
 
     public function __construct()
     {
-        $this->pillIntakeLogs = new ArrayCollection();
+        $this->pillIntakes = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -111,15 +115,15 @@ class Pill
     /**
      * @return Collection<int, PillIntake>
      */
-    public function getPillIntakeLogs(): Collection
+    public function getPillIntakes(): Collection
     {
-        return $this->pillIntakeLogs;
+        return $this->pillIntakes;
     }
 
     public function addPillIntakeLog(PillIntake $pillIntakeLog): static
     {
-        if (!$this->pillIntakeLogs->contains($pillIntakeLog)) {
-            $this->pillIntakeLogs->add($pillIntakeLog);
+        if (!$this->pillIntakes->contains($pillIntakeLog)) {
+            $this->pillIntakes->add($pillIntakeLog);
             $pillIntakeLog->setPill($this);
         }
 
@@ -128,7 +132,7 @@ class Pill
 
     public function removePillIntakeLog(PillIntake $pillIntakeLog): static
     {
-        if ($this->pillIntakeLogs->removeElement($pillIntakeLog)) {
+        if ($this->pillIntakes->removeElement($pillIntakeLog)) {
             // set the owning side to null (unless already changed)
             if ($pillIntakeLog->getPill() === $this) {
                 $pillIntakeLog->setPill(null);

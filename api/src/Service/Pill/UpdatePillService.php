@@ -24,7 +24,6 @@ class UpdatePillService
         private readonly PillDtoFactory         $factory,
         private readonly ValidatorInterface     $validator,
         private readonly PillMapper             $mapper,
-        private readonly EntityManagerInterface $entityManager,
     )
     {
     }
@@ -48,8 +47,7 @@ class UpdatePillService
         }
 
         $pill = $this->mapper->mapDtoToEntity($dto, $pill);
-
-        $this->entityManager->flush();
+        $this->repository->update();
 
         return $pill;
     }

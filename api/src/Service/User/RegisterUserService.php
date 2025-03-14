@@ -19,7 +19,6 @@ class RegisterUserService
         private readonly ValidatorInterface $validator,
         private readonly UserPasswordHasherInterface $passwordHasher,
         private readonly UserRepository $repository,
-        private readonly EntityManagerInterface $entityManager,
     )
     {
     }
@@ -57,6 +56,5 @@ class RegisterUserService
         $user->setPassword($this->passwordHasher->hashPassword($user, $dto->getPassword()));
 
         $this->repository->save($user);
-        $this->entityManager->flush();
     }
 }

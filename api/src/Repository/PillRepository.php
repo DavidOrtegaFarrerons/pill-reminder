@@ -29,7 +29,7 @@ class PillRepository extends BaseRepository implements RepositoryInterface
     {
         return $this->createQueryBuilder('p')
             ->select('p.id, p.name, p.startDate, p.frequency, p.endDate, pil.id as intakeId, pil.status as taken, pil.scheduledTime as nextPillTime')
-            ->leftJoin('p.pillIntakeLogs', 'pil')
+            ->leftJoin('p.pillIntakes', 'pil')
             ->andWhere('p.user = :user')
             ->andWhere('pil.status = :pending_status')
             ->setParameter('user', $user->getId()->toBinary())

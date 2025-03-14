@@ -15,7 +15,6 @@ class CreatePillIntakeService
 
     public function __construct(
         private readonly PillIntakeRepository $repository,
-        private readonly EntityManagerInterface $entityManager
     )
     {
     }
@@ -30,7 +29,6 @@ class CreatePillIntakeService
         ;
 
         $this->repository->save($pillIntake);
-        $this->entityManager->flush();
 
         return $pillIntake;
     }
@@ -48,7 +46,6 @@ class CreatePillIntakeService
         ;
 
         $this->repository->save($newPillIntake);
-        $this->entityManager->flush();
     }
 
     public function createAdjustedPillIntake(?PillIntake $pillIntake): void
@@ -68,12 +65,5 @@ class CreatePillIntakeService
 
 
         $this->repository->save($newPillIntake);
-        $this->entityManager->flush();
-    }
-
-    private function isLastPillIntake(PillIntake $pillIntake): bool
-    {
-        $nextPillIntakeTime = $pillIntake->getScheduledTime()->modify($pillIntake->getPill()->getFrequency());
-        return $nextPillIntakeTime >= $pillIntake->getPill()->getEndDate();
     }
 }

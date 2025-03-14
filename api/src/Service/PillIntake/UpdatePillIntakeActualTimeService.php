@@ -4,12 +4,13 @@ namespace App\Service\PillIntake;
 
 use App\Entity\PillIntake;
 use App\Enum\PillIntakeStatus;
+use App\Repository\PillIntakeRepository;
 use Doctrine\ORM\EntityManagerInterface;
 
 class UpdatePillIntakeActualTimeService
 {
 
-    public function __construct(private readonly EntityManagerInterface $entityManager)
+    public function __construct(private readonly PillIntakeRepository $repository)
     {
     }
 
@@ -22,6 +23,6 @@ class UpdatePillIntakeActualTimeService
             $pillIntake->setActualTime(new \DateTime());
         }
 
-        $this->entityManager->flush();
+        $this->repository->update();
     }
 }

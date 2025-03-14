@@ -25,7 +25,6 @@ class TakePillIntakeService
     public function __construct(
         private readonly PillIntakeRepository   $repository,
         private readonly UpdatePillIntakeActualTimeService $updatePillIntakeActualTimeService,
-        private readonly EntityManagerInterface $entityManager,
         private readonly EventDispatcherInterface $eventDispatcher
     ) {}
 
@@ -54,12 +53,12 @@ class TakePillIntakeService
 
         if ($pillIntake->isLastPillIntake()) {
             $pillIntake->setStatus(PillIntakeStatus::FINISHED);
-            $this->entityManager->flush();
+            $this->repository->update();
             return;
         }
 
         $pillIntake->setStatus($status);
-        $this->entityManager->flush();
+        $this->repository->update();
 
         match ($status) {
             PillIntakeStatus::TAKEN => $this->eventDispatcher->dispatch(new PillIntakeStatusTakenEvent($pillIntake)),

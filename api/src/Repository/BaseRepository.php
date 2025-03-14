@@ -24,10 +24,17 @@ abstract class BaseRepository extends ServiceEntityRepository
     public function save(object $entity) : void
     {
         $this->entityManager->persist($entity);
+        $this->entityManager->flush();
+    }
+
+    public function update() : void
+    {
+        $this->entityManager->flush();
     }
 
     public function delete(object $entity): void
     {
         $this->entityManager->remove($entity);
+        $this->entityManager->flush();
     }
 }

@@ -33,11 +33,11 @@ class PillController extends AbstractController
     public function createAction(#[CurrentUser] User $user, Request $request) : JsonResponse
     {
         $formData = json_decode($request->getContent(), true);
-        $this->pillCreationService->create($user, $formData);
+        $pill = $this->pillCreationService->create($user, $formData);
 
         return $this->json(
             [
-                'pill' => true
+                'pill' => $pill
             ]
         );
     }
@@ -64,15 +64,17 @@ class PillController extends AbstractController
             );
         }
 
-        return $this->json(['success' => true]);
+        return $this->json([], Response::HTTP_NO_CONTENT);
     }
 
     #[Route('/api/pills', 'get_all_pills', methods: ['GET'])]
     public function getAllAction(#[CurrentUser] User $user) : JsonResponse
     {
+        $pills = $this->pillRepository->getAllByUser($user);
+
         return $this->json(
             [
-                'pills' => $this->pillRepository->getAllByUser($user)
+                'pills' => $pills
             ],
         );
     }

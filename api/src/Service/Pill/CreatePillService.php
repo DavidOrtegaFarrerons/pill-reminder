@@ -24,7 +24,7 @@ class CreatePillService
     {
     }
 
-    public function create(User $user, array $formData) : ?Pill
+    public function create(User $user, array $formData) : Pill
     {
         $pillDto = $this->factory->createFromArray($formData);
         $errors = $this->validator->validate($pillDto);

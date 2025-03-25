@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Entity\User;
 use App\Service\PillIntake\GetPillIntakeService;
 use App\Service\PillIntake\TakePillIntakeService;
+use http\Exception\InvalidArgumentException;
 use http\Exception\UnexpectedValueException;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -33,21 +34,17 @@ class PilIntakeController extends AbstractController
             $this->takePillIntakeService->take($user, $formData, $id);
         } catch (UnauthorizedHttpException $exception) {
             return $this->json(['message' => $exception->getMessage()], Response::HTTP_FORBIDDEN);
-        } catch (UnexpectedValueException $exception) {
+        } catch (UnexpectedValueException|InvalidArgumentException $exception) {
             return $this->json(['message' => $exception->getMessage()], Response::HTTP_NOT_ACCEPTABLE);
         }
 
-        return $this->json([], Response::HTTP_ACCEPTED);
+        return $this->json([], Response::HTTP_NO_CONTENT);
     }
 
     #[Route('api/pill-intake', 'get_pill_intakes')]
     public function getAction(#[CurrentUser] User $user) : JsonResponse
     {
-        return $this->json(
-            $this->getPillIntakeService->get($user),
-            200,
-            [],
-            ['groups' => 'pill_intake:list']
-        );
+        $pillIntakes = $this->getPillIntakeService->get($user);
+        return $this->json($pillIntakes, 200, [], ['groups' => 'pill_intake:list']);
     }
 }
